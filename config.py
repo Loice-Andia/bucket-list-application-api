@@ -6,9 +6,8 @@ class Config(object):
     '''This base class contains configuration
     that is common in all environments
     '''
-    CSRF_ENABLED = True
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+    SQLALCHEMY_DATABASE_URI = "mysql://root:root@localhost/bucketlist"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
     @staticmethod

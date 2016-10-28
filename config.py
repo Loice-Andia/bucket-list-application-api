@@ -10,10 +10,6 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = "mysql://root:root@localhost/bucketlist"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
-    @staticmethod
-    def init_app(app):
-        pass
-
 
 class DevelopmentConfig(Config):
     '''This class configures the development

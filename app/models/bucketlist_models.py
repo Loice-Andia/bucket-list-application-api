@@ -24,9 +24,6 @@ class Users(db.Model):
 
         return self.password == password
 
-    def __repr__(self):
-        return '<Name %r>' % self.name
-
 
 class Bucketlists(db.Model):
 
@@ -40,7 +37,8 @@ class Bucketlists(db.Model):
         default=datetime.utcnow)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     creator = db.relationship('Users',
-                           backref=db.backref('bucketlists', lazy='dynamic'))
+                              backref=db.backref('bucketlists',
+                                                 lazy='dynamic'))
 
 
 class Items(db.Model):
@@ -53,4 +51,4 @@ class Items(db.Model):
     completed = db.Column(db.Boolean, default=False)
     bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'))
     bucketlist = db.relationship('Bucketlists',
-                           backref=db.backref('items', lazy='dynamic'))
+                                 backref=db.backref('items', lazy='dynamic'))

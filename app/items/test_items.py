@@ -15,13 +15,16 @@ class BucketListItemTest(GlobalTestCase):
             username='Loice',
             email='loiceandia@gmail.com',
             password='loice')
+        db.session.add(self.user)
+        db.session.commit()
+        user = Users.query.filter_by(username='Loice').first()
         self.bucketlist = Bucketlists(
             name="test_bucketlist",
             description="Holiday plans bucketlist",
-            time_created=datetime.datetime.now(),
+            time_created=str(datetime.datetime.now()),
+            creator_id=user.id
         )
-        self.bucketlist.creator.add(self.user)
-        db.session.add_all(self.user, self.bucketlist)
+        db.session.add(self.bucketlist)
         db.session.commit()
         response = self.client.post(
             url_for('login'),
@@ -30,6 +33,7 @@ class BucketListItemTest(GlobalTestCase):
                 'password': 'loice'}),
             content_type="application/json")
         self.token = response.json
+        self.test_bucketlist = Bucketlists.query.filter_by(name='test_bucketlist').first()
 
     def test_bucketlist_endpoint(self):
         response = self.client.get('/bucketlists/1/items/')
@@ -54,12 +58,31 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist': self.bucketlist
+                'bucketlist_id': self.test_bucketlist.id
             }),
             content_type='application/json',
             headers=self.token)
         self.assert_200(response)
-        self.assertIn("ITEM1 sucessfully added", response.data)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
+
+    def test_can_view_one_bucketlist_item(self):
+        response = self.client.post(
+            url_for('items', bucketlist_id=1),
+            data=json.dumps({
+                'name': 'item1',
+                'description': 'Test_item',
+                'completed': False,
+                'bucketlist_id': self.test_bucketlist.id
+            }),
+            content_type='application/json',
+            headers=self.token)
+        response = self.client.get(
+            url_for('one_item', bucketlist_id=1, item_id=1),
+            headers=self.token)
+        self.assert_200(response)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def test_can_view_items_in_a_bucketlist(self):
         self.client.post(
@@ -68,7 +91,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist': self.bucketlist
+                'bucketlist_id': self.test_bucketlist.id
             }),
             content_type='application/json',
             headers=self.token)
@@ -76,8 +99,8 @@ class BucketListItemTest(GlobalTestCase):
             url_for('items', bucketlist_id=1),
             headers=self.token)
         self.assert_200(response)
-        bucketlist_items = json.loads(response.data)
-        self.assertEqual(bucketlist_items.get("name"), "item1")
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def test_can_edit_item_in_a_bucketlist(self):
         self.client.post(
@@ -86,22 +109,23 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist': self.bucketlist
+                'bucketlist_id': self.test_bucketlist.id
             }),
             content_type='application/json',
             headers=self.token)
         response = self.client.put(
-            url_for('items', bucketlist_id=1, item_id=1),
+            url_for('one_item', bucketlist_id=1, item_id=1),
             data=json.dumps({
                 'name': 'Cook Risotto',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist': self.bucketlist
+                'bucketlist_id': self.test_bucketlist.id
             }),
             content_type='application/json',
             headers=self.token)
         self.assert_200(response)
-        self.assertIn('successfully updated', response.data)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def test_can_delete_bucketlist_item(self):
         self.client.post(
@@ -110,16 +134,17 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist': self.bucketlist
+                'bucketlist_id': self.test_bucketlist.id
             }),
             content_type='application/json',
             headers=self.token)
 
         response = self.client.delete(
-            url_for('items', bucketlist_id=1, item_id=1),
+            url_for('one_item', bucketlist_id=1, item_id=1),
             headers=self.token)
         self.assert_200(response)
-        self.assertIn('successfully deleted', response.data)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def test_can_search_for_item_in_bucketlist(self):
         self.client.post(
@@ -128,18 +153,19 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist': self.bucketlist
+                'bucketlist_id': self.test_bucketlist.id
             }),
             content_type='application/json',
             headers=self.token)
         response = self.client.get(
-            url_for('items', bucketlist_id=1, q='item'),
+            url_for('search_items', bucketlist_id=1, query='item'),
             headers=self.token)
         self.assert_200(response)
-        result = json.loads(response.data)
-        self.assertEqual(result.get("name"), "item1")
+        result = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(result)
 
     def tearDown(self):
+        db.session.close_all()
         db.drop_all()
 
 

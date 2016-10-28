@@ -9,7 +9,7 @@ from flask import url_for
 class RegistrationTest(GlobalTestCase):
 
     def test_register_endpoint(self):
-        response = self.client.get('/auth/register')
+        response = self.client.get(url_for('register'))
         self.assert_200(response)
 
     def test_registration_of_a_new_user(self):
@@ -20,8 +20,9 @@ class RegistrationTest(GlobalTestCase):
                  'password': 'loice',
                  'email': 'loice@gmail.com'}),
             content_type='application/json')
-        self.assertIn('Loice', response.data)
         self.assertEqual(response.status_code, 201)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def test_registration_of_existing_user(self):
         db.create_all()
@@ -37,26 +38,29 @@ class RegistrationTest(GlobalTestCase):
                 {'username': 'Loice',
                  'email': 'loiceandia@gmail.com',
                  'password': 'loice'}),
-            content_type='appliction/json')
-        self.assertIn('User already exists', response.data)
+            content_type='application/json')
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def test_registration_with_short_password(self):
         response = self.client.post(
             url_for('register'),
-            data=json.dumps(
-                {'username': 'Trial',
-                 'password': '123'}))
-        self.assertIn('Password needs to be more than 4 characters',
-                      response.data)
-        self.assertEquals(response.status_code, 400)
+            data=json.dumps({
+                'username': 'Trial',
+                'password': '123'}),
+            content_type='application/json')
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def test_incomplete_details_on_registration(self):
         response = self.client.post(
             url_for('register'),
             data=json.dumps({'username': 'Loice'}),
             content_type='application/json')
-        self.assertIn("Bad Request", response.data)
         self.assertEqual(response.status_code, 400)
+        data = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(data)
 
     def tearDown(self):
         db.drop_all()

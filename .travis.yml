@@ -5,8 +5,8 @@ python:
 services:
   - mysql
 before_script:
-  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n" | mysql -u root -p root
-  - echo "create database bucketlist_test;" 
+  - mysql -u root -e "create database bucketlist_test;" 
+  - echo "USE mysql;\nUPDATE user SET password=PASSWORD('root') WHERE user='root';\nFLUSH PRIVILEGES;\n"
 install:
   pip install -r requirements.txt
 script:

@@ -3,6 +3,7 @@ from flask_restful import Resource
 
 
 class Index(Resource):
+
     def get(self):
         return jsonify({"message": "Welcome to the BucketList API."
                         " Register a new user by sending a"
@@ -13,7 +14,8 @@ class Index(Resource):
 
 class Login(Resource):
     def get(self):
-        pass
+        return jsonify({"message": "To login,"
+                        "send a POST request to /auth/login."})
 
     def post(self):
         pass

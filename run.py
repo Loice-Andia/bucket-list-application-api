@@ -12,7 +12,7 @@ from flask_restful import Api
 
 manager = Manager(app)
 migrate = Migrate(app, db)
-api = Api(app, prefix="/api/v1/")
+api = Api(app, prefix="/api/v1")
 
 api.add_resource(Index,
                  '/',

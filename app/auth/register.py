@@ -1,6 +1,6 @@
 import json
 from app import db
-from flask import jsonify, request
+from flask import request
 from flask_restful import abort, Resource
 from app.models.bucketlist_models import Users
 

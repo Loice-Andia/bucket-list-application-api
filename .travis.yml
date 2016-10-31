@@ -2,6 +2,10 @@ sudo: false
 language: python
 python:
   - 3.5
+services:
+  - mysql
+before_script:
+  - mysql -u root -e "create database bucketlist_test;" 
 install:
   pip install -r requirements.txt
 script:

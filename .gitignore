@@ -6,37 +6,17 @@ __pycache__/
 # Distribution / packaging
 .Python
 env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
 
 # Unit test / coverage reports
-htmlcov/
 .tox/
 .coverage
 .coverage.*
-.cache
-nosetests.xml
 coverage.xml
-*,cover
+
 
 # Flask stuff:
 instance/
 .webassets-cache
-
-# pyenv
-.python-version
 
 # dotenv
 .env
@@ -44,9 +24,3 @@ instance/
 # virtualenv
 venv/
 ENV/
-
-# Spyder project settings
-.spyderproject
-
-# Rope project settings
-.ropeproject

@@ -146,6 +146,11 @@ class BucketListItemTest(GlobalTestCase):
         data = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(data)
 
+        response = self.client.get(
+            url_for('one_item', bucketlist_id=1, item_id=1),
+            headers=self.token)
+        self.assert_status(response, 404)
+
     def test_can_search_for_item_in_bucketlist(self):
         self.client.post(
             url_for('items', bucketlist_id=1),

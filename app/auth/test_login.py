@@ -63,7 +63,6 @@ class LoginTest(GlobalTestCase):
         self.assertIsNotNone(data)
 
     def tearDown(self):
-        db.session.close_all()
         db.drop_all()
 
 

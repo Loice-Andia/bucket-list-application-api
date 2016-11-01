@@ -1,10 +1,5 @@
-import json
-import jwt
-from app.models.bucketlist_models import Users
-from config import Config
-from datetime import datetime, timedelta
-from flask import jsonify, request
-from flask_restful import abort, Resource
+from flask import jsonify
+from flask_restful import Resource
 
 
 class Index(Resource):
@@ -23,27 +18,4 @@ class Login(Resource):
                         "send a POST request to /auth/login."})
 
     def post(self):
-        data = json.loads(request.get_data(as_text=True))
-        if not data:
-            abort(
-                400,
-                message="No params passed. Kindly fill you username, email and password")
-        username = data['username']
-        password = data['password']
-
-        if not username or not password:
-            abort(400,
-                  message="Kindly fill in the missing details")
-
-        user = Users.query.filter_by(username=username).first()
-        if user is None:
-            abort(400, message="User does not exist")
-        if user.verify_password(password):
-            payload = {
-                'sub': user.id,
-                'exp': datetime.utcnow() + timedelta(minutes=30)
-            }
-            token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
-            return jsonify({"message": "Welcome {}".format(user.username),
-                            "token": str(token)})
-        abort(400, message="Invalid password")
+        pass

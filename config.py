@@ -6,7 +6,7 @@ class Config(object):
     '''This base class contains configuration
     that is common in all environments
     '''
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'MIIEpQIBAAKCAQEA3Tz2'
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = "mysql://root@localhost/bucketlist"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 

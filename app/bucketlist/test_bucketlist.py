@@ -28,22 +28,28 @@ class BucketlistTest(GlobalTestCase):
         self.logged_in_user = Users.query.filter_by(username='Loice').first()
 
     def test_bucketlist_endpoint(self):
-        response = self.client.get('/bucketlists/')
+        response = self.client.get('/bucketlists/',
+                                   headers=self.token)
         self.assert_200(response)
 
-        response = self.client.post('/bucketlists/')
+        response = self.client.post('/bucketlists/',
+                                    headers=self.token)
         self.assert_200(response)
 
-        response = self.client.get('/bucketlists/1')
+        response = self.client.get('/bucketlists/1',
+                                   headers=self.token)
         self.assert_200(response)
 
-        response = self.client.put('/bucketlists/1')
+        response = self.client.put('/bucketlists/1',
+                                   headers=self.token)
         self.assert_200(response)
 
-        response = self.client.delete('/bucketlists/1')
+        response = self.client.delete('/bucketlists/1',
+                                      headers=self.token)
         self.assert_200(response)
 
-        response = self.client.get('/bucketlists?q=bucket1')
+        response = self.client.get('/bucketlists?q=bucket1',
+                                   headers=self.token)
         self.assert_200(response)
 
     def test_can_create_bucketlist(self):

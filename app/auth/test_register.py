@@ -10,7 +10,10 @@ class RegistrationTest(GlobalTestCase):
 
     def test_register_endpoint(self):
         response = self.client.get(url_for('register'))
-        self.assert_200(response)
+        data = json.loads(response.get_data(as_text=True))
+        self.assert_status(response, 200)
+        self.assertEqual('To register,send a POST request with username, password and email to /auth/register.',
+                         data['message'])
 
     def test_registration_of_a_new_user(self):
         response = self.client.post(

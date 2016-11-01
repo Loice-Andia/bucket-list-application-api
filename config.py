@@ -7,7 +7,7 @@ class Config(object):
     that is common in all environments
     '''
     SECRET_KEY = os.environ.get('SECRET_KEY')
-    SQLALCHEMY_DATABASE_URI = "mysql://root:root@localhost/bucketlist"
+    SQLALCHEMY_DATABASE_URI = "mysql://root@localhost/bucketlist"
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
 

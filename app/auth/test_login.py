@@ -17,12 +17,18 @@ class LoginTest(GlobalTestCase):
         db.session.commit()
 
     def test_index_endpoint(self):
-        response = self.client.get('/')
-        self.assert_status(response, 302)
+        response = self.client.get('/api/v1/')
+        data = json.loads(response.get_data(as_text=True))
+        self.assert_status(response, 200)
+        self.assertIn('Welcome to the BucketList API.',
+                      data['message'])
 
     def test_login_endpoint(self):
-        response = self.client.get('api/v1/auth/login')
-        self.assert_200(response)
+        response = self.client.get('/api/v1/auth/login/')
+        data = json.loads(response.get_data(as_text=True))
+        self.assert_status(response, 200)
+        self.assertEqual('To login,send a POST request to /auth/login.',
+                         data['message'])
 
     def test_login_with_right_credentials(self):
         response = self.client.post(

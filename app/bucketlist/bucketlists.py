@@ -35,6 +35,7 @@ class Bucketlist(Resource):
                 bucketlist.id: {
                     "name": bucketlist.name,
                     "description": bucketlist.description,
+                    "time_created": bucketlist.time_created,
                     "creator": bucketlist.creator.username
                 }})
         return jsonify(result)
@@ -143,8 +144,22 @@ class OneBucketlist(Resource):
 
 
 class SearchBucketlist(Resource):
-    def get(self, query):
-        pass
-
     def post(self, query):
-        pass
+        user_id = decode_token(request)
+        import ipdb
+        ipdb.set_trace()
+        search_result = Bucketlists.query.filter_by(
+            Bucketlists.name.like('%' + query + '%'),
+            creator_id=user_id).all()
+        if not len(search_result):
+            abort(400, message="{} does not match any bucktlist names".format(
+                query))
+        for bucketlist in search_result:
+            result.update({
+                bucketlist.id: {
+                    "name": bucketlist.name,
+                    "description": bucketlist.description,
+                    "time_created": bucketlist.time_created,
+                    "creator": bucketlist.creator.username
+                }})
+        return jsonify(result)

@@ -45,5 +45,5 @@ class Login(Resource):
             }
             token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
             return jsonify({"message": "Welcome {}".format(user.username),
-                            "token": str(token)})
+                            "token": token.decode('utf-8')})
         abort(400, message="Invalid password")

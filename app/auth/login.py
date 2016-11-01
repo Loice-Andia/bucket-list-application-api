@@ -2,7 +2,7 @@ import json
 import jwt
 from app.models.bucketlist_models import Users
 from config import Config
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import jsonify, request
 from flask_restful import abort, Resource
 
@@ -35,18 +35,15 @@ class Login(Resource):
             abort(400,
                   message="Kindly fill in the missing details")
 
-        if len(password) < 4:
-            abort(400,
-                  message="Password should be 4 or more characters")
-
         user = Users.query.filter_by(username=username).first()
         if user is None:
             abort(400, message="User does not exist")
         if user.verify_password(password):
             payload = {
                 'sub': user.id,
-                'exp': datetime.utcnow() + datetime.timedelta(minutes=30)
+                'exp': datetime.utcnow() + timedelta(minutes=30)
             }
             token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
-        return jsonify({"message": "Welcome {}".format(user.username),
-                        "token": token})
+            return jsonify({"message": "Welcome {}".format(user.username),
+                            "token": str(token)})
+        abort(400, message="Invalid password")

@@ -1,4 +1,8 @@
 import json
+import jwt
+from app.models.bucketlist_models import Users
+from config import Config
+from datetime import datetime
 from flask import jsonify, request
 from flask_restful import abort, Resource
 
@@ -21,8 +25,9 @@ class Login(Resource):
     def post(self):
         data = json.loads(request.get_data(as_text=True))
         if not data:
-            abort(400,
-                  message="No params passed. Kindly fill you username, email and password")
+            abort(
+                400,
+                message="No params passed. Kindly fill you username, email and password")
         username = data['username']
         password = data['password']
 
@@ -37,3 +42,11 @@ class Login(Resource):
         user = Users.query.filter_by(username=username).first()
         if user is None:
             abort(400, message="User does not exist")
+        if user.verify_password(password):
+            payload = {
+                'sub': user.id,
+                'exp': datetime.utcnow() + datetime.timedelta(minutes=30)
+            }
+            token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')
+        return jsonify({"message": "Welcome {}".format(user.username),
+                        "token": token})

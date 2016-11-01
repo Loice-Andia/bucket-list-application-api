@@ -27,7 +27,7 @@ class Login(Resource):
         if not data:
             abort(
                 400,
-                message="No params passed. Kindly fill you username, email and password")
+                message="No params passed. Kindly fill you username and password")
         username = data['username']
         password = data['password']
 

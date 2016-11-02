@@ -74,7 +74,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -92,7 +92,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -110,7 +110,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -133,7 +133,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -151,7 +151,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -161,7 +161,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'Travel',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             headers=self.token)
         self.assert_200(response)

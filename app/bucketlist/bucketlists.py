@@ -32,7 +32,7 @@ class Bucketlist(Resource):
             abort(400, message="User does not have bucketlists")
         for bucketlist in bucketlists:
             result.update({
-                bucketlist.id: {
+                bucketlist.bucketlist_id: {
                     "name": bucketlist.name,
                     "description": bucketlist.description,
                     "time_created": bucketlist.time_created,
@@ -81,12 +81,12 @@ class OneBucketlist(Resource):
         user_id = decode_token(request)
         single_bucketlist = Bucketlists.query.filter_by(
             creator_id=user_id,
-            id=bucketlist_id).first()
+            bucketlist_id=bucketlist_id).first()
         if not single_bucketlist:
             abort(400, message="No bucketlist matching the id {}".format(
                 bucketlist_id))
         result.update({
-            single_bucketlist.id: {
+            single_bucketlist.bucketlist_id: {
                 "name": single_bucketlist.name,
                 "description": single_bucketlist.description,
                 "creator": single_bucketlist.creator.username
@@ -105,8 +105,7 @@ class OneBucketlist(Resource):
 
         single_bucketlist = Bucketlists.query.filter_by(
             creator_id=user_id,
-            id=bucketlist_id).first()
-        print (single_bucketlist)
+            bucketlist_id=bucketlist_id).first()
         if not single_bucketlist:
             abort(400, message="No bucketlist matching the id {}".format(
                 bucketlist_id))
@@ -119,7 +118,8 @@ class OneBucketlist(Resource):
             db.session.add(single_bucketlist)
             db.session.commit()
             return jsonify({
-                'message': "{} bucketlist updated successfully".format(single_bucketlist.name)})
+                'message': "{} bucketlist updated successfully".format(
+                    single_bucketlist.name)})
         except Exception:
             abort(500, message="Bucketlist not updated")
 
@@ -129,7 +129,7 @@ class OneBucketlist(Resource):
             abort(400, message="Missing bucketlist ID")
         single_bucketlist = Bucketlists.query.filter_by(
             creator_id=user_id,
-            id=bucketlist_id).first()
+            bucketlist_id=bucketlist_id).first()
         if not single_bucketlist:
             abort(400, message="No bucketlist matching the id {}".format(
                 bucketlist_id))
@@ -144,22 +144,25 @@ class OneBucketlist(Resource):
 
 
 class SearchBucketlist(Resource):
-    def post(self, query):
+    def get(self):
+        args = request.args.to_dict()
+        print (args)
         user_id = decode_token(request)
         import ipdb
         ipdb.set_trace()
-        search_result = Bucketlists.query.filter_by(
-            Bucketlists.name.like('%' + query + '%'),
-            creator_id=user_id).all()
-        if not len(search_result):
-            abort(400, message="{} does not match any bucktlist names".format(
-                query))
-        for bucketlist in search_result:
-            result.update({
-                bucketlist.id: {
-                    "name": bucketlist.name,
-                    "description": bucketlist.description,
-                    "time_created": bucketlist.time_created,
-                    "creator": bucketlist.creator.username
-                }})
-        return jsonify(result)
+        if q:
+            search_result = Bucketlists.query.filter_by(
+                Bucketlists.name.like('%' + query + '%'),
+                creator_id=user_id).all()
+            if not len(search_result):
+                abort(400, message="{} does not match any bucktlist names".format(
+                    query))
+            for bucketlist in search_result:
+                result.update({
+                    bucketlist.bucketlist_id: {
+                        "name": bucketlist.name,
+                        "description": bucketlist.description,
+                        "time_created": bucketlist.time_created,
+                        "creator": bucketlist.creator.username
+                    }})
+            return jsonify(result)

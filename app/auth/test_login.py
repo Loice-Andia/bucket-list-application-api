@@ -38,7 +38,7 @@ class LoginTest(GlobalTestCase):
                  'password': 'loice'}),
             content_type='application/json')
         data = json.loads(response.get_data(as_text=True))
-        self.assertIsNotNone(data)
+        self.assertIn("Token", data.keys())
 
     def test_login_with_non_existing_user(self):
         response = self.client.post(

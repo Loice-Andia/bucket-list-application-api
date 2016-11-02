@@ -22,7 +22,7 @@ class BucketListItemTest(GlobalTestCase):
             name="test_bucketlist",
             description="Holiday plans bucketlist",
             time_created=str(datetime.datetime.now()),
-            creator_id=user.id
+            creator_id=user.user_id
         )
         db.session.add(self.bucketlist)
         db.session.commit()
@@ -58,7 +58,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -73,7 +73,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -91,7 +91,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -109,7 +109,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -119,7 +119,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'Cook Risotto',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -134,7 +134,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -158,7 +158,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)

@@ -8,7 +8,7 @@ class Users(db.Model):
 
     __tablename__ = "users"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(120), unique=True)
     email = db.Column(db.String(200), nullable=False)
     password = db.Column(PasswordType(onload=lambda **kwargs: dict(
@@ -29,13 +29,13 @@ class Bucketlists(db.Model):
 
     __tablename__ = "bucketlists"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    bucketlist_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), unique=True)
     description = db.Column(db.String(1000))
     time_created = db.Column(
         db.DateTime(timezone=True),
         default=datetime.utcnow)
-    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     creator = db.relationship('Users',
                               backref=db.backref('bucketlists',
                                                  lazy='dynamic'))
@@ -45,10 +45,10 @@ class Items(db.Model):
 
     __tablename__ = "items"
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    item_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), unique=True)
     description = db.Column(db.String(1000))
     completed = db.Column(db.Boolean, default=False)
-    bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'))
+    bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.bucketlist_id'))
     bucketlist = db.relationship('Bucketlists',
                                  backref=db.backref('items', lazy='dynamic'))

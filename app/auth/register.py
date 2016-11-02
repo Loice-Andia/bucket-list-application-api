@@ -1,6 +1,6 @@
 import json
 from app import db
-from flask import request
+from flask import jsonify, request
 from flask_restful import abort, Resource
 from app.models.bucketlist_models import Users
 
@@ -42,5 +42,5 @@ class Register(Resource):
             db.session.commit()
             return jsonify({
                 'message': "{} created successfully".format(username)})
-        except Exception:
+        except Exception as e:
             abort(500, message="User not created")

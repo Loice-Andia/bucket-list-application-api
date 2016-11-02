@@ -18,22 +18,22 @@ api.add_resource(Index,
                  '/',
                  endpoint='home')
 api.add_resource(Login,
-                 '/auth/login/',
+                 '/auth/login',
                  endpoint='login')
 api.add_resource(Register,
-                 '/auth/register/',
+                 '/auth/register',
                  endpoint='register')
 api.add_resource(Bucketlist,
-                 '/bucketlists/',
+                 '/bucketlists',
                  endpoint='bucketlists')
 api.add_resource(OneBucketlist,
-                 '/bucketlists/<bucketlist_id>/',
+                 '/bucketlists/<bucketlist_id>',
                  endpoint='one_bucketlist')
 api.add_resource(SearchBucketlist,
                  '/bucketlists?q=<query>',
                  endpoint='search_bucketlists')
 api.add_resource(BucketListItems,
-                 '/bucketlists/<bucketlist_id>/items/',
+                 '/bucketlists/<bucketlist_id>/items',
                  endpoint='items')
 api.add_resource(OneBucketListItem,
                  '/bucketlists/<bucketlist_id>/items/<item_id>',

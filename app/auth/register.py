@@ -16,13 +16,16 @@ class Register(Resource):
         if not data:
             abort(400,
                   message="No params passed. Kindly fill you username, email and password")
+        if len(data.keys()) < 3:
+            abort(400,
+                  message="Ensure you provide a username, email and password")
+        if not data['username'] or not data['email'] or not data['password']:
+            abort(400,
+                  message="Kindly fill in the missing details")
+
         username = data['username']
         email = data['email']
         password = data['password']
-
-        if not username or not email or not password:
-            abort(400,
-                  message="Kindly fill in the missing details")
 
         if len(password) < 4:
             abort(400,

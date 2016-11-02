@@ -18,13 +18,13 @@ class ModelsTest(GlobalTestCase):
             name="holiday",
             description="Holiday plans bucketlist",
             time_created=datetime.datetime.utcnow(),
-            creator_id=self.user.id
+            creator_id=self.user.user_id
         )
         self.bucketlist_items = Items(
             name="beach",
             description="Visit diani beach",
             completed=False,
-            bucketlist_id=self.bucketlist.id
+            bucketlist_id=self.bucketlist.bucketlist_id
         )
         db.session.add_all([self.user, self.bucketlist, self.bucketlist_items])
         db.session.commit()

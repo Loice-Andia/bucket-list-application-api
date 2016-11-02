@@ -30,7 +30,7 @@ api.add_resource(OneBucketlist,
                  '/bucketlists/<bucketlist_id>',
                  endpoint='one_bucketlist')
 api.add_resource(SearchBucketlist,
-                 '/bucketlists?q=<query>',
+                 '/bucketlists?q=<search_query>',
                  endpoint='search_bucketlists')
 api.add_resource(BucketListItems,
                  '/bucketlists/<bucketlist_id>/items',
@@ -39,7 +39,7 @@ api.add_resource(OneBucketListItem,
                  '/bucketlists/<bucketlist_id>/items/<item_id>',
                  endpoint='one_item')
 api.add_resource(SearchBucketlistItems,
-                 '/bucketlists/<bucketlist_id>/items?q=<query>',
+                 '/bucketlists/<bucketlist_id>/items?q=<search_query>',
                  endpoint='search_items')
 
 

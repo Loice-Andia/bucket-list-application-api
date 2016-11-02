@@ -32,24 +32,10 @@ class BucketListItemTest(GlobalTestCase):
                 'username': 'Loice',
                 'password': 'loice'}),
             content_type="application/json")
-        self.token = response.json
-        self.test_bucketlist = Bucketlists.query.filter_by(name='test_bucketlist').first()
-
-    def test_bucketlist_endpoint(self):
-        response = self.client.get('/bucketlists/1/items/')
-        self.assert_200(response)
-
-        response = self.client.post('/bucketlists/1/items/')
-        self.assert_200(response)
-
-        response = self.client.put('bucketlists/1/items/1')
-        self.assert_200(response)
-
-        response = self.client.delete('bucketlists/1/items/1')
-        self.assert_200(response)
-
-        response = self.client.get('/bucketlists/1/items?q=item1')
-        self.assert_200(response)
+        data = json.loads(response.get_data(as_text=True))
+        self.token = {'Authorization': data['token']}
+        self.test_bucketlist = Bucketlists.query.filter_by(
+            name='test_bucketlist').first()
 
     def test_can_add_items_to_a_bucketlist(self):
         response = self.client.post(
@@ -149,7 +135,7 @@ class BucketListItemTest(GlobalTestCase):
         response = self.client.get(
             url_for('one_item', bucketlist_id=1, item_id=1),
             headers=self.token)
-        self.assert_status(response, 404)
+        self.assert_status(response, 400)
 
     def test_can_search_for_item_in_bucketlist(self):
         self.client.post(

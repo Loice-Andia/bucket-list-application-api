@@ -144,19 +144,18 @@ class OneBucketlist(Resource):
 
 
 class SearchBucketlist(Resource):
-    def get(self):
-        args = request.args.to_dict()
-        print (args)
+    def get(self, search_query):
+        print(search_query)
         user_id = decode_token(request)
-        import ipdb
-        ipdb.set_trace()
-        if q:
+        if search_query:
+            # db.session.query(Bucketlists).filter(Bucketlists.name.like(query))
             search_result = Bucketlists.query.filter_by(
-                Bucketlists.name.like('%' + query + '%'),
-                creator_id=user_id).all()
+                creator_id=user_id,
+                name=Bucketlists.name.like('%' + search_query + '%')).all()
+            print (search_result)
             if not len(search_result):
                 abort(400, message="{} does not match any bucktlist names".format(
-                    query))
+                    search_query))
             for bucketlist in search_result:
                 result.update({
                     bucketlist.bucketlist_id: {

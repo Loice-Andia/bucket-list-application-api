@@ -34,7 +34,7 @@ class Bucketlists(db.Model):
     description = db.Column(db.String(1000))
     time_created = db.Column(
         db.DateTime(timezone=True),
-        default=datetime.utcnow)
+        default=datetime.utcnow())
     creator_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     creator = db.relationship('Users',
                               backref=db.backref('bucketlists',

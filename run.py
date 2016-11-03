@@ -29,9 +29,6 @@ api.add_resource(Bucketlist,
 api.add_resource(OneBucketlist,
                  '/bucketlists/<bucketlist_id>',
                  endpoint='one_bucketlist')
-api.add_resource(SearchBucketlist,
-                 '/bucketlists?q=<search_query>',
-                 endpoint='search_bucketlists')
 api.add_resource(BucketListItems,
                  '/bucketlists/<bucketlist_id>/items',
                  endpoint='items')

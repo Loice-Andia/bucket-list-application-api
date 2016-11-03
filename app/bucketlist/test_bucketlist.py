@@ -114,14 +114,14 @@ class BucketlistTest(GlobalTestCase):
             content_type='application/json',
             headers=self.token)
         response = self.client.get(
-            url_for('search_bucketlists', search_query='bucketlist'),
+            '/api/v1/bucketlists?q=bucketlist',
             headers=self.token)
         self.assert_200(response)
         data = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(data)
-        self.assertIn('1', data)
+
         response = self.client.get(
-            url_for('search_bucketlists', search_query='none'),
+            '/api/v1/bucketlists?q=none',
             headers=self.token)
         self.assert_status(response, 400)
         result = json.loads(response.get_data(as_text=True))

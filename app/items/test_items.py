@@ -149,11 +149,19 @@ class BucketListItemTest(GlobalTestCase):
             content_type='application/json',
             headers=self.token)
         response = self.client.get(
-            url_for('search_items', bucketlist_id=1, query='item'),
+            url_for('search_items', bucketlist_id=1, search_query='item'),
             headers=self.token)
         self.assert_200(response)
         result = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(result)
+        response = self.client.get(
+            url_for('search_items', bucketlist_id=1, search_query='none'),
+            headers=self.token)
+        self.assert_status(response, 400)
+        result = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(result)
+        self.assertIn('does not match any bucketlist item names',
+                      result['message'])
 
     def tearDown(self):
         db.session.close_all()

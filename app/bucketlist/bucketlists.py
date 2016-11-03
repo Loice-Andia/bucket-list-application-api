@@ -145,23 +145,25 @@ class OneBucketlist(Resource):
 
 class SearchBucketlist(Resource):
     def get(self, search_query):
-        print(search_query)
+        result = {}
         user_id = decode_token(request)
         if search_query:
-            # db.session.query(Bucketlists).filter(Bucketlists.name.like(query))
-            search_result = Bucketlists.query.filter_by(
-                creator_id=user_id,
-                name=Bucketlists.name.like('%' + search_query + '%')).all()
-            print (search_result)
+            search_result = Bucketlists.query.filter(
+                Bucketlists.name.ilike('%' + search_query + '%')).all()
+
             if not len(search_result):
-                abort(400, message="{} does not match any bucktlist names".format(
-                    search_query))
+                abort(
+                    400,
+                    message="{} does not match any bucketlist names".format(
+                        search_query))
             for bucketlist in search_result:
-                result.update({
-                    bucketlist.bucketlist_id: {
-                        "name": bucketlist.name,
-                        "description": bucketlist.description,
-                        "time_created": bucketlist.time_created,
-                        "creator": bucketlist.creator.username
-                    }})
+                if bucketlist.creator_id is user_id:
+                    result.update({
+                        bucketlist.bucketlist_id: {
+                            "name": bucketlist.name,
+                            "description": bucketlist.description,
+                            "time_created": bucketlist.time_created,
+                            "creator": bucketlist.creator.username
+                        }})
             return jsonify(result)
+        abort(400, message="Missing search parameter")

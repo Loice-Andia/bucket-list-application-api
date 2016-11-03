@@ -118,8 +118,16 @@ class BucketlistTest(GlobalTestCase):
             headers=self.token)
         self.assert_200(response)
         data = json.loads(response.get_data(as_text=True))
-        print (data)
         self.assertIsNotNone(data)
+        self.assertIn('1', data)
+        response = self.client.get(
+            url_for('search_bucketlists', search_query='none'),
+            headers=self.token)
+        self.assert_status(response, 400)
+        result = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(result)
+        self.assertIn('does not match any bucketlist names',
+                      result['message'])
 
     def test_can_edit_bucketlist(self):
         self.client.post(

@@ -143,8 +143,24 @@ class OneBucketListItem(Resource):
 
 
 class SearchBucketlistItems(Resource):
-    def get(self, bucketlist_id, query):
-        pass
+    def get(self, bucketlist_id, search_query):
+        result = {}
+        decode_token(request)
+        if search_query:
+            search_result = Items.query.filter(
+                Items.name.ilike('%' + search_query + '%')).all()
 
-    def post(self, bucketlist_id, query):
-        pass
+            if not len(search_result):
+                abort(
+                    400,
+                    message="{} does not match any bucketlist item names".format(
+                        search_query))
+            for item in search_result:
+                if item.bucketlist_id is bucketlist_id:
+                    result.update({
+                        item.item_id: {
+                            "name": item.name,
+                            "description": item.description,
+                            "completed": item.completed}})
+            return jsonify(result)
+        abort(400, message="Missing search parameter")

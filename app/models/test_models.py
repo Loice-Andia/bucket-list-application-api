@@ -14,19 +14,26 @@ class ModelsTest(GlobalTestCase):
             email="user@gmail.com",
             password="user"
         )
+        db.session.add(self.user)
+        db.session.commit()
+        user = Users.query.filter_by(username='user').first()
         self.bucketlist = Bucketlists(
             name="holiday",
             description="Holiday plans bucketlist",
-            time_created=datetime.datetime.utcnow(),
-            creator_id=self.user.user_id
+            date_created=datetime.datetime.utcnow(),
+            creator_id=user.user_id
         )
+        db.session.add(self.bucketlist)
+        db.session.commit()
+        bucketlist = Bucketlists.query.filter_by(name='holiday').first()
         self.bucketlist_items = Items(
             name="beach",
             description="Visit diani beach",
             completed=False,
-            bucketlist_id=self.bucketlist.bucketlist_id
+            date_created=datetime.datetime.utcnow(),
+            bucketlist_id=bucketlist.bucketlist_id
         )
-        db.session.add_all([self.user, self.bucketlist, self.bucketlist_items])
+        db.session.add(self.bucketlist_items)
         db.session.commit()
 
     def test_can_create_user(self):
@@ -50,7 +57,7 @@ class ModelsTest(GlobalTestCase):
 
     def test_can_edit_bucketlist(self):
         self.bucketlist.name = 'Kenyan Holiday'
-        db.session.merge(self.bucketlist)
+        db.session.add(self.bucketlist)
         db.session.commit()
         bucketlist = Bucketlists.query.filter_by(name='Kenyan Holiday').first()
         self.assertEqual(bucketlist.name, 'Kenyan Holiday')
@@ -73,18 +80,6 @@ class ModelsTest(GlobalTestCase):
         db.session.commit()
         item = Items.query.filter_by(name='Diani beach').first()
         self.assertEqual(item, None)
-
-    def test_can_delete_bucketlist(self):
-        db.session.delete(self.bucketlist)
-        db.session.commit()
-        bucketlist = Bucketlists.query.filter_by(name='Kenyan Holiday').first()
-        self.assertEqual(bucketlist, None)
-
-    def test_can_delete_user(self):
-        db.session.delete(self.user)
-        db.session.commit()
-        user = Users.query.filter_by(username='user').first()
-        self.assertEqual(user, None)
 
     def tearDown(self):
         db.session.close_all()

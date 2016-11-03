@@ -1,13 +1,13 @@
 """empty message
 
-Revision ID: 8e2e5d5f282b
+Revision ID: cd13f36fb91e
 Revises: None
-Create Date: 2016-11-02 16:18:48.664421
+Create Date: 2016-11-03 13:05:51.470827
 
 """
 
 # revision identifiers, used by Alembic.
-revision = '8e2e5d5f282b'
+revision = 'cd13f36fb91e'
 down_revision = None
 
 from alembic import op
@@ -30,8 +30,9 @@ def upgrade():
     sa.Column('bucketlist_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=200), nullable=True),
     sa.Column('description', sa.String(length=1000), nullable=True),
-    sa.Column('time_created', sa.DateTime(timezone=True), nullable=True),
-    sa.Column('creator_id', sa.Integer(), nullable=True),
+    sa.Column('date_created', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('date_modified', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('creator_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['creator_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('bucketlist_id'),
     sa.UniqueConstraint('name')
@@ -41,8 +42,10 @@ def upgrade():
     sa.Column('name', sa.String(length=200), nullable=True),
     sa.Column('description', sa.String(length=1000), nullable=True),
     sa.Column('completed', sa.Boolean(), nullable=True),
-    sa.Column('bucketlist_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['bucketlist_id'], ['bucketlists.bucketlist_id'], ),
+    sa.Column('date_created', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('date_modified', sa.DateTime(timezone=True), nullable=True),
+    sa.Column('bucketlist_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['bucketlist_id'], ['bucketlists.bucketlist_id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('item_id'),
     sa.UniqueConstraint('name')
     )

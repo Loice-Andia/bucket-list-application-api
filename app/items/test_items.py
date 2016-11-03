@@ -2,7 +2,7 @@ import datetime
 import json
 import unittest
 from app import db
-from app.models.bucketlist_models import Bucketlists, Users
+from app.models.bucketlist_models import Bucketlists, Users, Items
 from app.test_config import GlobalTestCase
 from flask import url_for
 
@@ -10,6 +10,7 @@ from flask import url_for
 class BucketListItemTest(GlobalTestCase):
 
     def setUp(self):
+        db.drop_all()
         db.create_all()
         self.user = Users(
             username='Loice',
@@ -21,7 +22,7 @@ class BucketListItemTest(GlobalTestCase):
         self.bucketlist = Bucketlists(
             name="test_bucketlist",
             description="Holiday plans bucketlist",
-            time_created=str(datetime.datetime.now()),
+            date_created=str(datetime.datetime.now()),
             creator_id=user.user_id
         )
         db.session.add(self.bucketlist)
@@ -44,6 +45,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
+                'date_created': str(datetime.datetime.utcnow()),
                 'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
@@ -59,6 +61,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
+                'date_created': str(datetime.datetime.utcnow()),
                 'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
@@ -77,6 +80,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
+                'date_created': str(datetime.datetime.utcnow()),
                 'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
@@ -95,12 +99,14 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
+                'date_created': str(datetime.datetime.utcnow()),
                 'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
+        item = Items.query.filter_by(name='item1').first()
         response = self.client.put(
-            url_for('one_item', bucketlist_id=1, item_id=1),
+            url_for('one_item', bucketlist_id=1, item_id=item.item_id),
             data=json.dumps({
                 'name': 'Cook Risotto',
                 'description': 'Test_item',
@@ -120,6 +126,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
+                'date_created': str(datetime.datetime.utcnow()),
                 'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
@@ -144,6 +151,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
+                'date_created': str(datetime.datetime.utcnow()),
                 'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',

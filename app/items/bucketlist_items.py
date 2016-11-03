@@ -1,7 +1,8 @@
 import json
 from app import db
-from app.models.bucketlist_models import Items
+from app.models.bucketlist_models import Bucketlists, Items
 from app.bucketlist.bucketlists import decode_token
+from datetime import datetime
 from flask import jsonify, request
 from flask_restful import abort, Resource
 
@@ -11,18 +12,24 @@ class BucketListItems(Resource):
         """ List all bucketlists created by the user"""
         result = {}
         decode_token(request)
+        bucketlist = Bucketlists.query.filter_by(
+            bucketlist_id=bucketlist_id).first()
+        if bucketlist is None:
+            abort(400, message="Wrong bucketlist ID")
         items = Items.query.filter_by(bucketlist_id=bucketlist_id).all()
         if not len(items):
             abort(400, message="Bucketlist does not have items")
         for item in items:
             result.update({
-                item.item_id: {
-                    "name": item.name,
-                    "description": item.description,
-                    "completed": item.completed,
-                    "bucketlist": item.bucketlist.name,
-                    "owner": item.bucketlist.creator.username
-                }})
+                "id": item.item_id,
+                "name": item.name,
+                "description": item.description,
+                "completed": item.completed,
+                "date_created": item.date_created,
+                "date_modified": item.date_modified,
+                "bucketlist": item.bucketlist.name,
+                "owner": item.bucketlist.creator.username
+            })
         return jsonify(result)
 
     def post(self, bucketlist_id):
@@ -112,6 +119,7 @@ class OneBucketListItem(Resource):
                 single_item.description = data['description']
             if 'completed' in data.keys():
                 single_item.completed = data['completed']
+            single_item.date_modified = datetime.utcnow()
             db.session.add(single_item)
             db.session.commit()
             return jsonify({

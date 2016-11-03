@@ -32,10 +32,14 @@ class Bucketlists(db.Model):
     bucketlist_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(200), unique=True)
     description = db.Column(db.String(1000))
-    time_created = db.Column(
+    date_created = db.Column(
         db.DateTime(timezone=True),
         default=datetime.utcnow())
-    creator_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    date_modified = db.Column(
+        db.DateTime(timezone=True),
+        nullable=True)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.user_id'),
+                           nullable=False)
     creator = db.relationship('Users',
                               backref=db.backref('bucketlists',
                                                  lazy='dynamic'))
@@ -49,6 +53,14 @@ class Items(db.Model):
     name = db.Column(db.String(200), unique=True)
     description = db.Column(db.String(1000))
     completed = db.Column(db.Boolean, default=False)
-    bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.bucketlist_id'))
+    date_created = db.Column(
+        db.DateTime(timezone=True),
+        default=datetime.utcnow())
+    date_modified = db.Column(
+        db.DateTime(timezone=True),
+        nullable=True)
+    bucketlist_id = db.Column(db.Integer,
+                              db.ForeignKey('bucketlists.bucketlist_id'),
+                              nullable=False)
     bucketlist = db.relationship('Bucketlists',
                                  backref=db.backref('items', lazy='dynamic'))

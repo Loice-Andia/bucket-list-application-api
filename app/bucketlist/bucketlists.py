@@ -1,7 +1,7 @@
 import json
 import jwt
 from app import db
-from app.models.bucketlist_models import Bucketlists
+from app.models.bucketlist_models import Bucketlists, Items
 from config import Config
 from datetime import datetime
 from flask import jsonify, request
@@ -26,18 +26,32 @@ class Bucketlist(Resource):
     def get(self):
         """ List all bucketlists created by the user"""
         result = {}
+        item_list = []
         user_id = decode_token(request)
         bucketlists = Bucketlists.query.filter_by(creator_id=user_id).all()
         if not len(bucketlists):
             abort(400, message="User does not have bucketlists")
         for bucketlist in bucketlists:
+            items = Items.query.filter_by(
+                bucketlist_id=bucketlist.bucketlist_id).all()
+            for item in items:
+                item_list.append({
+                    "id": item.item_id,
+                    "name": item.name,
+                    "description": item.description,
+                    "date_created": item.date_created,
+                    "date_modified": item.date_modified,
+                    "completed": item.completed
+                })
             result.update({
-                bucketlist.bucketlist_id: {
-                    "name": bucketlist.name,
-                    "description": bucketlist.description,
-                    "time_created": bucketlist.time_created,
-                    "creator": bucketlist.creator.username
-                }})
+                "id": bucketlist.bucketlist_id,
+                "name": bucketlist.name,
+                "description": bucketlist.description,
+                "items": item_list,
+                "date_created": bucketlist.date_created,
+                "date_modified": bucketlist.date_modified,
+                "creator": bucketlist.creator.username
+            })
         return jsonify(result)
 
     def post(self):
@@ -64,7 +78,7 @@ class Bucketlist(Resource):
             new_bucketlist = Bucketlists(
                 name=name,
                 description=description,
-                time_created=datetime.utcnow(),
+                date_created=datetime.utcnow(),
                 creator_id=creator_id
             )
             db.session.add(new_bucketlist)
@@ -78,6 +92,7 @@ class Bucketlist(Resource):
 class OneBucketlist(Resource):
     def get(self, bucketlist_id):
         result = {}
+        item_list = []
         user_id = decode_token(request)
         single_bucketlist = Bucketlists.query.filter_by(
             creator_id=user_id,
@@ -85,10 +100,24 @@ class OneBucketlist(Resource):
         if not single_bucketlist:
             abort(400, message="No bucketlist matching the id {}".format(
                 bucketlist_id))
+        items = Items.query.filter_by(
+            bucketlist_id=bucketlist_id).all()
+        for item in items:
+            item_list.append({
+                "id": item.item_id,
+                "name": item.name,
+                "description": item.description,
+                "date_created": item.date_created,
+                "date_modified": item.date_modified,
+                "completed": item.completed
+            })
         result.update({
             single_bucketlist.bucketlist_id: {
                 "name": single_bucketlist.name,
                 "description": single_bucketlist.description,
+                "items": item_list,
+                "date_created": single_bucketlist.date_created,
+                "date_modified": single_bucketlist.date_modified,
                 "creator": single_bucketlist.creator.username
             }})
         return jsonify(result)
@@ -115,6 +144,7 @@ class OneBucketlist(Resource):
                 single_bucketlist.name = data['name']
             if 'description' in data.keys():
                 single_bucketlist.description = data['description']
+            single_bucketlist.date_modified = datetime.utcnow()
             db.session.add(single_bucketlist)
             db.session.commit()
             return jsonify({
@@ -134,6 +164,11 @@ class OneBucketlist(Resource):
             abort(400, message="No bucketlist matching the id {}".format(
                 bucketlist_id))
         try:
+            items = Items.query.filter_by(
+                bucketlist_id=bucketlist_id).all()
+            for item in items:
+                db.session.delete(item)
+                db.session.commit()
             db.session.delete(single_bucketlist)
             db.session.commit()
             return jsonify({
@@ -162,7 +197,7 @@ class SearchBucketlist(Resource):
                         bucketlist.bucketlist_id: {
                             "name": bucketlist.name,
                             "description": bucketlist.description,
-                            "time_created": bucketlist.time_created,
+                            "date_created": bucketlist.date_created,
                             "creator": bucketlist.creator.username
                         }})
             return jsonify(result)

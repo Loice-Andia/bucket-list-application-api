@@ -34,7 +34,7 @@ class BucketlistTest(GlobalTestCase):
             data=json.dumps({
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
-                'time_created': str(datetime.datetime.now()),
+                'date_created': str(datetime.datetime.now()),
                 'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
@@ -49,7 +49,7 @@ class BucketlistTest(GlobalTestCase):
             data=json.dumps({
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
-                'time_created': str(datetime.datetime.now()),
+                'date_created': str(datetime.datetime.now()),
                 'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
@@ -67,7 +67,7 @@ class BucketlistTest(GlobalTestCase):
             data=json.dumps({
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
-                'time_created': str(datetime.datetime.now()),
+                'date_created': str(datetime.datetime.now()),
                 'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
@@ -85,7 +85,7 @@ class BucketlistTest(GlobalTestCase):
             data=json.dumps({
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
-                'time_created': str(datetime.datetime.now()),
+                'date_created': str(datetime.datetime.now()),
                 'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
@@ -108,7 +108,7 @@ class BucketlistTest(GlobalTestCase):
             data=json.dumps({
                 'name': 'bucketlist1',
                 'description': 'Test bucketlist',
-                'time_created': str(datetime.datetime.now()),
+                'date_created': str(datetime.datetime.now()),
                 'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
@@ -135,7 +135,7 @@ class BucketlistTest(GlobalTestCase):
             data=json.dumps({
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
-                'time_created': str(datetime.datetime.now()),
+                'date_created': str(datetime.datetime.now()),
                 'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
@@ -145,7 +145,7 @@ class BucketlistTest(GlobalTestCase):
             data=json.dumps({
                 'name': 'Travel',
                 'description': 'Test bucketlist',
-                'time_created': str(datetime.datetime.now()),
+                'date_created': str(datetime.datetime.now()),
                 'creator_id': self.logged_in_user.user_id
             }),
             headers=self.token)

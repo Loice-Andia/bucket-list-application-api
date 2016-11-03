@@ -22,7 +22,7 @@ class BucketListItemTest(GlobalTestCase):
             name="test_bucketlist",
             description="Holiday plans bucketlist",
             time_created=str(datetime.datetime.now()),
-            creator_id=user.id
+            creator_id=user.user_id
         )
         db.session.add(self.bucketlist)
         db.session.commit()
@@ -32,24 +32,10 @@ class BucketListItemTest(GlobalTestCase):
                 'username': 'Loice',
                 'password': 'loice'}),
             content_type="application/json")
-        self.token = response.json
-        self.test_bucketlist = Bucketlists.query.filter_by(name='test_bucketlist').first()
-
-    def test_bucketlist_endpoint(self):
-        response = self.client.get('/bucketlists/1/items/')
-        self.assert_200(response)
-
-        response = self.client.post('/bucketlists/1/items/')
-        self.assert_200(response)
-
-        response = self.client.put('bucketlists/1/items/1')
-        self.assert_200(response)
-
-        response = self.client.delete('bucketlists/1/items/1')
-        self.assert_200(response)
-
-        response = self.client.get('/bucketlists/1/items?q=item1')
-        self.assert_200(response)
+        data = json.loads(response.get_data(as_text=True))
+        self.token = {'Authorization': data['token']}
+        self.test_bucketlist = Bucketlists.query.filter_by(
+            name='test_bucketlist').first()
 
     def test_can_add_items_to_a_bucketlist(self):
         response = self.client.post(
@@ -58,7 +44,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -73,7 +59,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -91,7 +77,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -109,7 +95,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -119,7 +105,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'Cook Risotto',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -134,7 +120,7 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -149,7 +135,7 @@ class BucketListItemTest(GlobalTestCase):
         response = self.client.get(
             url_for('one_item', bucketlist_id=1, item_id=1),
             headers=self.token)
-        self.assert_status(response, 404)
+        self.assert_status(response, 400)
 
     def test_can_search_for_item_in_bucketlist(self):
         self.client.post(
@@ -158,16 +144,24 @@ class BucketListItemTest(GlobalTestCase):
                 'name': 'item1',
                 'description': 'Test_item',
                 'completed': False,
-                'bucketlist_id': self.test_bucketlist.id
+                'bucketlist_id': self.test_bucketlist.bucketlist_id
             }),
             content_type='application/json',
             headers=self.token)
         response = self.client.get(
-            url_for('search_items', bucketlist_id=1, query='item'),
+            url_for('search_items', bucketlist_id=1, search_query='item'),
             headers=self.token)
         self.assert_200(response)
         result = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(result)
+        response = self.client.get(
+            url_for('search_items', bucketlist_id=1, search_query='none'),
+            headers=self.token)
+        self.assert_status(response, 400)
+        result = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(result)
+        self.assertIn('does not match any bucketlist item names',
+                      result['message'])
 
     def tearDown(self):
         db.session.close_all()

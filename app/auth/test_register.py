@@ -8,6 +8,9 @@ from flask import url_for
 
 class RegistrationTest(GlobalTestCase):
 
+    def setUp(self):
+        db.create_all()
+
     def test_register_endpoint(self):
         response = self.client.get(url_for('register'))
         data = json.loads(response.get_data(as_text=True))
@@ -23,12 +26,13 @@ class RegistrationTest(GlobalTestCase):
                  'password': 'loice',
                  'email': 'loice@gmail.com'}),
             content_type='application/json')
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
         data = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(data)
+        self.assertIn("created successfully",
+                      data['message'])
 
     def test_registration_of_existing_user(self):
-        db.create_all()
         user = Users(
             username='Loice',
             email='loiceandia@gmail.com',
@@ -39,22 +43,27 @@ class RegistrationTest(GlobalTestCase):
             url_for('register'),
             data=json.dumps(
                 {'username': 'Loice',
-                 'email': 'loiceandia@gmail.com',
+                 'email': 'loice@gmail.com',
                  'password': 'loice'}),
             content_type='application/json')
         data = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(data)
+        self.assertIn("User already exists",
+                      data['message'])
 
     def test_registration_with_short_password(self):
         response = self.client.post(
             url_for('register'),
             data=json.dumps({
                 'username': 'Trial',
+                'email': 'trial@gmail.com',
                 'password': '123'}),
             content_type='application/json')
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(data)
+        self.assertIn("Password should be 4 or more characters",
+                      data['message'])
 
     def test_incomplete_details_on_registration(self):
         response = self.client.post(
@@ -64,6 +73,8 @@ class RegistrationTest(GlobalTestCase):
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(data)
+        self.assertIn("provide a username, email and password",
+                      data['message'])
 
     def tearDown(self):
         db.session.close_all()

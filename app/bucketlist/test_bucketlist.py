@@ -24,33 +24,9 @@ class BucketlistTest(GlobalTestCase):
                 'username': 'Loice',
                 'password': 'loice'}),
             content_type="application/json")
-        self.token = response.json
+        data = json.loads(response.get_data(as_text=True))
+        self.token = {'Authorization': data['token']}
         self.logged_in_user = Users.query.filter_by(username='Loice').first()
-
-    def test_bucketlist_endpoint(self):
-        response = self.client.get('/bucketlists/',
-                                   headers=self.token)
-        self.assert_200(response)
-
-        response = self.client.post('/bucketlists/',
-                                    headers=self.token)
-        self.assert_200(response)
-
-        response = self.client.get('/bucketlists/1',
-                                   headers=self.token)
-        self.assert_200(response)
-
-        response = self.client.put('/bucketlists/1',
-                                   headers=self.token)
-        self.assert_200(response)
-
-        response = self.client.delete('/bucketlists/1',
-                                      headers=self.token)
-        self.assert_200(response)
-
-        response = self.client.get('/bucketlists?q=bucket1',
-                                   headers=self.token)
-        self.assert_200(response)
 
     def test_can_create_bucketlist(self):
         response = self.client.post(
@@ -59,7 +35,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -74,12 +50,12 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
         response = self.client.get(
-            url_for('bucketlists', bucketlist_id=None),
+            url_for('bucketlists'),
             headers=self.token)
         self.assert_200(response)
         data = json.loads(response.get_data(as_text=True))
@@ -92,7 +68,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -110,7 +86,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -124,25 +100,34 @@ class BucketlistTest(GlobalTestCase):
         response = self.client.get(
             url_for('one_bucketlist', bucketlist_id=1),
             headers=self.token)
-        self.assert_status(response, 404)
+        self.assert_status(response, 400)
 
     def test_can_search_for_bucketlist(self):
         self.client.post(
             url_for('bucketlists'),
             data=json.dumps({
-                'name': 'test_bucketlist',
+                'name': 'bucketlist1',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
         response = self.client.get(
-            url_for('search_bucketlists', query='test'),
+            url_for('search_bucketlists', search_query='bucketlist'),
             headers=self.token)
         self.assert_200(response)
         data = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(data)
+        self.assertIn('1', data)
+        response = self.client.get(
+            url_for('search_bucketlists', search_query='none'),
+            headers=self.token)
+        self.assert_status(response, 400)
+        result = json.loads(response.get_data(as_text=True))
+        self.assertIsNotNone(result)
+        self.assertIn('does not match any bucketlist names',
+                      result['message'])
 
     def test_can_edit_bucketlist(self):
         self.client.post(
@@ -151,7 +136,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'test_bucketlist',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             content_type='application/json',
             headers=self.token)
@@ -161,7 +146,7 @@ class BucketlistTest(GlobalTestCase):
                 'name': 'Travel',
                 'description': 'Test bucketlist',
                 'time_created': str(datetime.datetime.now()),
-                'creator_id': self.logged_in_user.id
+                'creator_id': self.logged_in_user.user_id
             }),
             headers=self.token)
         self.assert_200(response)

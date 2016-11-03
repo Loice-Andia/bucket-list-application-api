@@ -40,7 +40,7 @@ class Login(Resource):
             abort(400, message="User does not exist")
         if user.verify_password(password):
             payload = {
-                'sub': user.id,
+                'sub': user.user_id,
                 'exp': datetime.utcnow() + timedelta(minutes=30)
             }
             token = jwt.encode(payload, Config.SECRET_KEY, algorithm='HS256')

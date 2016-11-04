@@ -7,6 +7,10 @@ db = SQLAlchemy()
 
 
 def create_app(config_name):
+    """
+    This function creates a Flask instance for
+    the application and configures it.
+    """
     application = Flask(__name__)
 
     application.config.from_object(config[config_name])

@@ -6,6 +6,11 @@ from app.models.bucketlist_models import Users
 
 
 class Register(Resource):
+    """
+    This is the class for the registration resources.
+    GET: Provides the registration instructions.
+    POST: Adds a user o the database.
+    """
     def get(self):
         return jsonify({"message": "To register,"
                         "send a POST request with username, password and email"

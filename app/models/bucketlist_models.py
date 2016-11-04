@@ -5,6 +5,9 @@ from sqlalchemy_utils import PasswordType
 
 
 class Users(db.Model):
+    """
+    This class contains the database schema of the Users
+    i.e. Table and Columns"""
 
     __tablename__ = "users"
 
@@ -21,11 +24,17 @@ class Users(db.Model):
     ), ), unique=False, nullable=False)
 
     def verify_password(self, password):
+        """
+        Function to verify the password of a user
+        """
 
         return self.password == password
 
 
 class Bucketlists(db.Model):
+    """
+    This class contains the database schema of the Bucketlists
+    i.e. Table and Columns"""
 
     __tablename__ = "bucketlists"
 
@@ -46,6 +55,9 @@ class Bucketlists(db.Model):
 
 
 class Items(db.Model):
+    """
+    This class contains the database schema of the Items
+    i.e. Table and Columns"""
 
     __tablename__ = "items"
 

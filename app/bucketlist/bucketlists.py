@@ -9,6 +9,7 @@ from flask_restful import abort, Resource
 
 
 def decode_token(request):
+    """Function to authenticate the token"""
     token = request.headers.get('Authorization')
     if not token:
         abort(401, message="No Authorization token")
@@ -23,6 +24,19 @@ def decode_token(request):
 
 
 class Bucketlist(Resource):
+    """
+    This is the class for all the Bucketlist resources.
+    GET: retrieves all the bucketlists a user has.
+        Options:
+            ?q : Provides a search parameter.
+            ?limit: Provides a limit to the number of bucketlists displayed per page.
+    POST: Adds a bucketlist.
+
+    If a bucketlist_id is provided in the url:
+    GET: retrieves the details of the bucketlist.
+    PUT: Updates the details of a bucketlist.
+    DELETE: Removes a bucketlist.
+    """
     def get(self):
         """ List all bucketlists created by the user"""
         result = {}
@@ -39,7 +53,8 @@ class Bucketlist(Resource):
         if 'q' in query_string:
             search_result = Bucketlists.query.filter(
                 Bucketlists.name.ilike(
-                    '%' + query_string['q'] + '%')).paginate(
+                    '%' + query_string['q'] + '%')).filter_by(
+                creator_id=user_id).paginate(
                 page_no, limit)
 
             if not len(search_result.items):

@@ -6,6 +6,11 @@ from .bucketlist_models import Bucketlists, Items, Users
 
 
 class ModelsTest(GlobalTestCase):
+    """
+    This is the class for testing all the models: Users,
+    Bucketlists and Items
+    It contains tests for Creation, Editing and Deleting
+    of items in the models."""
 
     def setUp(self):
         db.create_all()

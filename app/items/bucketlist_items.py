@@ -8,11 +8,24 @@ from flask_restful import abort, Resource
 
 
 class BucketListItems(Resource):
+    """
+    This is the class for all the Items resources.
+    GET: retrieves all the bucketlist items when given a bucketlist_id.
+        Options:
+            ?q : Provides a search parameter.
+            ?limit: Provides a limit to the number of items displayed per page.
+    POST: Adds an item to the bucketlist which id has been specified.
+
+    If an item_id is provided in the url:
+    GET: retrieves the details of the item.
+    PUT: Updates the details of an item.
+    DELETE: Removes an item from a bucketlist.
+    """
     def get(self, bucketlist_id):
         """ List all bucketlists created by the user"""
         result = {}
         item_list = []
-        decode_token(request)
+        user_id = decode_token(request)
         bucketlist = Bucketlists.query.filter_by(
             bucketlist_id=bucketlist_id).first()
         if bucketlist is None:
@@ -25,6 +38,12 @@ class BucketListItems(Resource):
         if type(page_no) is not int:
             abort(400, message="Limit must be an integer")
 
+        bucketlist_items = Items.query.filter_by(
+            bucketlist_id=bucketlist_id).paginate(
+            page_no, limit)
+        if not len(bucketlist_items.items):
+            abort(400, message="Bucketlist does not have items")
+
         if 'q' in query_string:
             search_result = Items.query.filter(
                 Items.name.ilike('%' + query_string['q'] + '%')).paginate(
@@ -35,22 +54,20 @@ class BucketListItems(Resource):
                     message="{} does not match any bucketlist item names".format(
                         query_string['q']))
             for item in search_result.items:
-                if item.bucketlist_id is int(bucketlist_id):
-                    result = {
-                        "id": item.item_id,
-                        "name": item.name,
-                        "description": item.description,
-                        "completed": item.completed,
-                        "date_created": item.date_created,
-                        "date_modified": item.date_modified,
-                        "bucketlist": item.bucketlist.name,
-                        "owner": item.bucketlist.creator.username}
-                item_list.append(result)
+                if item.bucketlist.creator.user_id is user_id:
+                    if item.bucketlist_id is int(bucketlist_id):
+                        result = {
+                            "id": item.item_id,
+                            "name": item.name,
+                            "description": item.description,
+                            "completed": item.completed,
+                            "date_created": item.date_created,
+                            "date_modified": item.date_modified,
+                            "bucketlist": item.bucketlist.name,
+                            "owner": item.bucketlist.creator.username}
+                    item_list.append(result)
             return jsonify(item_list)
-        bucketlist_items = Items.query.filter_by(bucketlist_id=bucketlist_id).paginate(
-            page_no, limit)
-        if not len(bucketlist_items.items):
-            abort(400, message="Bucketlist does not have items")
+
         for item in bucketlist_items.items:
             result = {
                 "id": item.item_id,

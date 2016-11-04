@@ -18,8 +18,8 @@ Navigate to the `bucket-list-application-api` directory:
 
 Create a virtual environment and activate it.
 
-` mkvirtualenv Bucketlist`
-` workon Bucketlist `
+` mkvirtualenv Bucketlist
+workon Bucketlist `
 
 Install dependencies:
 

@@ -1,10 +1,8 @@
 from app import app, db
 from app.auth.login import Index, Login
 from app.auth.register import Register
-from app.bucketlist.bucketlists import Bucketlist, SearchBucketlist
-from app.bucketlist.bucketlists import OneBucketlist
-from app.items.bucketlist_items import BucketListItems, SearchBucketlistItems
-from app.items.bucketlist_items import OneBucketListItem
+from app.bucketlist.bucketlists import Bucketlist, OneBucketlist
+from app.items.bucketlist_items import BucketListItems, OneBucketListItem
 from app.models.bucketlist_models import Bucketlists, Items, Users
 from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
@@ -35,9 +33,6 @@ api.add_resource(BucketListItems,
 api.add_resource(OneBucketListItem,
                  '/bucketlists/<bucketlist_id>/items/<item_id>',
                  endpoint='one_item')
-api.add_resource(SearchBucketlistItems,
-                 '/bucketlists/<bucketlist_id>/items?q=<search_query>',
-                 endpoint='search_items')
 
 
 def make_shell_context():

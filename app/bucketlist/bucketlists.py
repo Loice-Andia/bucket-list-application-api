@@ -27,11 +27,14 @@ class Bucketlist(Resource):
         """ List all bucketlists created by the user"""
         result = {}
         item_list = []
+        bucketlist_list = []
         user_id = decode_token(request)
         query_string = request.args.to_dict()
         limit = int(query_string.get('limit', 20))
-        page_no = query_string.get('page number', 1)
+        page_no = int(query_string.get('page', 1))
         if type(limit) is not int:
+            abort(400, message="Limit must be an integer")
+        if type(page_no) is not int:
             abort(400, message="Limit must be an integer")
         if 'q' in query_string:
             search_result = Bucketlists.query.filter(
@@ -57,7 +60,7 @@ class Bucketlist(Resource):
                             "date_modified": item.date_modified,
                             "completed": item.completed
                         })
-                    result.update({
+                    result = {
                         "id": bucketlist.bucketlist_id,
                         "name": bucketlist.name,
                         "description": bucketlist.description,
@@ -65,13 +68,15 @@ class Bucketlist(Resource):
                         "date_created": bucketlist.date_created,
                         "date_modified": bucketlist.date_modified,
                         "creator": bucketlist.creator.username
-                    })
-            return jsonify(result)
+                    }
+                bucketlist_list.append(result)
+            return jsonify(bucketlist_list)
         bucketlists = Bucketlists.query.filter_by(creator_id=user_id).paginate(
             page_no, limit)
         if not len(bucketlists.items):
             abort(400, message="User does not have bucketlists")
         for bucketlist in bucketlists.items:
+            item_list = []
             items = Items.query.filter_by(
                 bucketlist_id=bucketlist.bucketlist_id).all()
             for item in items:
@@ -83,7 +88,7 @@ class Bucketlist(Resource):
                     "date_modified": item.date_modified,
                     "completed": item.completed
                 })
-            result.update({
+            result = {
                 "id": bucketlist.bucketlist_id,
                 "name": bucketlist.name,
                 "description": bucketlist.description,
@@ -91,16 +96,22 @@ class Bucketlist(Resource):
                 "date_created": bucketlist.date_created,
                 "date_modified": bucketlist.date_modified,
                 "creator": bucketlist.creator.username
-            })
+            }
+            bucketlist_list.append(result)
         next_page = 'None'
         previous_page = 'None'
         if bucketlists.has_next:
-            next_page = str(request.url_root) + 'api/v1/bucketlists?limit=' + \
-                str(limit) + '&page=' + str(page_no + 1)
+            next_page = '{}api/v1/bucketlists?limit={}&page={}'.format(
+                str(request.url_root),
+                str(limit),
+                str(page_no + 1))
         if bucketlists.has_prev:
-            previous_page = str(request.url_root) + 'api/v1/bucketlists?limit=' + \
-                str(limit) + '&page=' + str(page_no - 1)
-        return jsonify({'bucketlists': result,
+            previous_page = '{}api/v1/bucketlists?limit={}&page={}'.format(
+                str(request.url_root),
+                str(limit),
+                str(page_no - 1))
+        return jsonify({'bucketlists': bucketlist_list,
+                        'total pages': bucketlists.pages,
                         'previous': previous_page,
                         'next': next_page})
 
@@ -226,29 +237,3 @@ class OneBucketlist(Resource):
                     single_bucketlist.name)})
         except Exception:
             abort(500, message="Bucketlist not deleted")
-
-
-class SearchBucketlist(Resource):
-    def get(self, search_query):
-        result = {}
-        user_id = decode_token(request)
-        if search_query:
-            search_result = Bucketlists.query.filter(
-                Bucketlists.name.ilike('%' + search_query + '%')).all()
-
-            if not len(search_result):
-                abort(
-                    400,
-                    message="{} does not match any bucketlist names".format(
-                        search_query))
-            for bucketlist in search_result:
-                if bucketlist.creator_id is user_id:
-                    result.update({
-                        bucketlist.bucketlist_id: {
-                            "name": bucketlist.name,
-                            "description": bucketlist.description,
-                            "date_created": bucketlist.date_created,
-                            "creator": bucketlist.creator.username
-                        }})
-            return jsonify(result)
-        abort(400, message="Missing search parameter")

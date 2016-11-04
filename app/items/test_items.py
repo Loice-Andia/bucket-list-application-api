@@ -157,13 +157,13 @@ class BucketListItemTest(GlobalTestCase):
             content_type='application/json',
             headers=self.token)
         response = self.client.get(
-            url_for('search_items', bucketlist_id=1, search_query='item'),
+            '/api/v1/bucketlists/1/items?q=item',
             headers=self.token)
         self.assert_200(response)
         result = json.loads(response.get_data(as_text=True))
         self.assertIsNotNone(result)
         response = self.client.get(
-            url_for('search_items', bucketlist_id=1, search_query='none'),
+            '/api/v1/bucketlists/1/items?q=none',
             headers=self.token)
         self.assert_status(response, 400)
         result = json.loads(response.get_data(as_text=True))

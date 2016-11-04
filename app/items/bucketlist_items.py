@@ -11,16 +11,48 @@ class BucketListItems(Resource):
     def get(self, bucketlist_id):
         """ List all bucketlists created by the user"""
         result = {}
+        item_list = []
         decode_token(request)
         bucketlist = Bucketlists.query.filter_by(
             bucketlist_id=bucketlist_id).first()
         if bucketlist is None:
             abort(400, message="Wrong bucketlist ID")
-        items = Items.query.filter_by(bucketlist_id=bucketlist_id).all()
-        if not len(items):
+        query_string = request.args.to_dict()
+        limit = int(query_string.get('limit', 20))
+        page_no = int(query_string.get('page', 1))
+        if type(limit) is not int:
+            abort(400, message="Limit must be an integer")
+        if type(page_no) is not int:
+            abort(400, message="Limit must be an integer")
+
+        if 'q' in query_string:
+            search_result = Items.query.filter(
+                Items.name.ilike('%' + query_string['q'] + '%')).paginate(
+                page_no, limit)
+            if not len(search_result.items):
+                abort(
+                    400,
+                    message="{} does not match any bucketlist item names".format(
+                        query_string['q']))
+            for item in search_result.items:
+                if item.bucketlist_id is int(bucketlist_id):
+                    result = {
+                        "id": item.item_id,
+                        "name": item.name,
+                        "description": item.description,
+                        "completed": item.completed,
+                        "date_created": item.date_created,
+                        "date_modified": item.date_modified,
+                        "bucketlist": item.bucketlist.name,
+                        "owner": item.bucketlist.creator.username}
+                item_list.append(result)
+            return jsonify(item_list)
+        bucketlist_items = Items.query.filter_by(bucketlist_id=bucketlist_id).paginate(
+            page_no, limit)
+        if not len(bucketlist_items.items):
             abort(400, message="Bucketlist does not have items")
-        for item in items:
-            result.update({
+        for item in bucketlist_items.items:
+            result = {
                 "id": item.item_id,
                 "name": item.name,
                 "description": item.description,
@@ -29,8 +61,26 @@ class BucketListItems(Resource):
                 "date_modified": item.date_modified,
                 "bucketlist": item.bucketlist.name,
                 "owner": item.bucketlist.creator.username
-            })
-        return jsonify(result)
+            }
+            item_list.append(result)
+        next_page = 'None'
+        previous_page = 'None'
+        if bucketlist_items.has_next:
+            next_page = '{}api/v1/bucketlists/{}/items?limit={}&page={}'.format(
+                str(request.url_root),
+                str(bucketlist_id),
+                str(limit),
+                str(page_no + 1))
+        if bucketlist_items.has_prev:
+            previous_page = '{}api/v1/bucketlists/{}/items?limit={}&page={}'.format(
+                str(request.url_root),
+                str(bucketlist_id),
+                str(limit),
+                str(page_no - 1))
+        return jsonify({'bucketlist items': item_list,
+                        'total pages': bucketlist_items.pages,
+                        'previous': previous_page,
+                        'next': next_page})
 
     def post(self, bucketlist_id):
         decode_token(request)
@@ -148,27 +198,3 @@ class OneBucketListItem(Resource):
                     single_item.name)})
         except Exception:
             abort(500, message="Item not deleted")
-
-
-class SearchBucketlistItems(Resource):
-    def get(self, bucketlist_id, search_query):
-        result = {}
-        decode_token(request)
-        if search_query:
-            search_result = Items.query.filter(
-                Items.name.ilike('%' + search_query + '%')).all()
-
-            if not len(search_result):
-                abort(
-                    400,
-                    message="{} does not match any bucketlist item names".format(
-                        search_query))
-            for item in search_result:
-                if item.bucketlist_id is bucketlist_id:
-                    result.update({
-                        item.item_id: {
-                            "name": item.name,
-                            "description": item.description,
-                            "completed": item.completed}})
-            return jsonify(result)
-        abort(400, message="Missing search parameter")
